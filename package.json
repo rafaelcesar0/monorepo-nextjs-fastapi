@@ -17,10 +17,13 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "check-types": "turbo check-types",
+		"uv": "uv --directory apps/api",
     "dev:api": "turbo -F api dev",
     "dev:native": "turbo -F native dev",
     "dev:web": "turbo -F web dev",
-    "check": "biome check --write ."
+    "check": "biome check --write --unsafe .",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@node-python/env": "workspace:*",
@@ -30,6 +33,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.2.0",
     "@node-python/config": "workspace:*",
+    "@playwright/test": "^1.55.0",
     "turbo": "^2.6.3",
     "typescript": "catalog:"
   },

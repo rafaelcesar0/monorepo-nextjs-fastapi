@@ -17,6 +17,7 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "check-types": "turbo check-types",
+    "dev:api": "turbo -F api dev",
     "dev:native": "turbo -F native dev",
     "dev:web": "turbo -F web dev",
     "check": "biome check --write ."

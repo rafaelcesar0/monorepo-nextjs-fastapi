@@ -35,5 +35,13 @@
 		"@types/react-dom": "^19.2.3",
 		"tailwindcss": "^4.1.10",
 		"typescript": "^5"
-	}
+	},
+  "ignoreScripts": [
+    "sharp",
+    "unrs-resolver"
+  ],
+  "trustedDependencies": [
+    "sharp",
+    "unrs-resolver"
+  ]
 }

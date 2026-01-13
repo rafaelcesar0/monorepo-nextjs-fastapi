@@ -1,67 +1,112 @@
-# node-python
+# node-python monorepo
 
-## Features
+Monorepo com Next.js (App Router) e FastAPI, usando Bun workspaces + Turborepo para dev e Docker para producao.
 
-- **TypeScript** - For type safety and improved developer experience
-- **Next.js** - Full-stack React framework
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **shadcn/ui** - Reusable UI components
-- **Biome** - Linting and formatting
-- **Turborepo** - Optimized monorepo build system
+## Estrutura
 
-## Getting Started
+```
+repo/
+  apps/
+    web/                 # Next.js
+    api/                 # FastAPI
+  packages/
+    api-client/          # tipos gerados do OpenAPI
+    config/              # configs compartilhados
+  package.json
+  turbo.json
+  docker-compose.prod.yml
+```
 
-First, install the dependencies:
+## Requisitos
+
+- Bun
+- Python 3.12+
+- uv (para o backend)
+
+## Desenvolvimento
+
+1) Instale deps:
 
 ```bash
 bun install
 ```
 
-Then, run the development server:
+2) Suba tudo (web + api):
 
 ```bash
-bun run dev
+bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the web application.
+- Web: http://localhost:3000
+- API: http://localhost:8000
 
-## Project Structure
-
-```
-node-python/
-├── apps/
-│   ├── web/         # Frontend application (Next.js)
-```
-
-## Available Scripts
-
-- `bun run dev`: Start all applications in development mode
-- `bun run build`: Build all applications
-- `bun run dev:web`: Start only the web application
-- `bun run check-types`: Check TypeScript types across all apps
-- `bun run check`: Run Biome formatting and linting
-- `bun run test:e2e`: Run end-to-end tests with Playwright
-
-## End-to-end tests
-
-First, install Playwright browsers (one-time setup):
+### Apenas web
 
 ```bash
-bunx playwright install --with-deps
+bun web:dev
 ```
 
-Then, run the tests:
+### Apenas api
 
 ```bash
-bun run test:e2e
+bun api:dev
 ```
 
-## Docker (web + api)
+O comando da API executa `uv sync` e inicia o Uvicorn com reload.
 
-Build and run both services:
+### Gerar client OpenAPI
+
+Com a API rodando:
 
 ```bash
-docker compose up --build
+bun api:client
 ```
 
-Web will be available at [http://localhost:3000](http://localhost:3000) and the API at [http://localhost:8000](http://localhost:8000).
+Isso atualiza `packages/api-client/src/types.ts` a partir de `http://localhost:8000/openapi.json`.
+
+[Saiba mais](docs/api-client.md)
+
+## Atualizar deps do backend (uv)
+
+Edite `apps/api/pyproject.toml` e rode:
+
+```bash
+cd apps/api
+uv lock --upgrade
+uv sync
+```
+
+Isso atualiza o `uv.lock` e instala as dependencias.
+
+## Produção (Docker + Dokploy)
+
+Build local (opcional):
+
+```bash
+docker compose -f docker-compose.prod.yml build
+```
+
+Os containers expõem apenas as portas internas:
+- web: 3000
+- api: 8000
+
+Nao ha proxy no repositorio. O roteamento e HTTPS sao configurados no painel do Dokploy.
+
+### Opcoes de roteamento no Dokploy
+
+Opcao 1 — Mesmo dominio com path:
+- WEB: Host=app.seudominio.com Path=/ Internal Path=/ Strip Path=OFF Container Port=3000
+- API: Host=app.seudominio.com Path=/api Internal Path=/ Strip Path=ON  Container Port=8000
+
+Opcao 2 — Subdominio:
+- WEB: Host=app.seudominio.com Path=/ Internal Path=/ Strip Path=OFF Container Port=3000
+- API: Host=api.seudominio.com Path=/ Internal Path=/ Strip Path=OFF Container Port=8000
+
+## Variaveis de ambiente
+
+Cada app precisa de seu proprio `.env`. Consulte os `.env.example` de cada app:
+
+```bash
+cp apps/web/.env.example apps/web/.env
+cp apps/api/.env.example apps/api/.env
+```

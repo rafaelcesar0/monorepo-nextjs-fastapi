@@ -1,0 +1,18 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    expose:
+      - "3000"
+    environment:
+      NEXT_PUBLIC_API_BASE: /api
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    expose:
+      - "8000"
+    environment:
+      UVICORN_WORKERS: "2"
+      ENV: production

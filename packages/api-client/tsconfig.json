@@ -1,0 +1,7 @@
+{
+	"extends": "@node-python/config/tsconfig.base.json",
+	"compilerOptions": {
+		"noEmit": true
+	},
+	"include": ["src/**/*.ts"]
+}

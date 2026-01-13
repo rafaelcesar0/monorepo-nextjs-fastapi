@@ -1,3 +1,0 @@
-{
-  "extends": "@node-python/config/tsconfig.base.json"
-}

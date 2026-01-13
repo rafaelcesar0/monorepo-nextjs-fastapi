@@ -1,0 +1,22 @@
+{
+	"name": "@node-python/api-client",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"default": "./src/index.ts"
+		}
+	},
+	"scripts": {
+		"gen-types": "openapi-typescript http://localhost:8000/openapi.json -o src/types.ts",
+		"build": "echo 'Types only package'",
+		"lint": "biome check .",
+		"test": "echo \"No tests\""
+	},
+	"devDependencies": {
+		"openapi-typescript": "^6.7.0",
+		"typescript": "^5"
+	}
+}

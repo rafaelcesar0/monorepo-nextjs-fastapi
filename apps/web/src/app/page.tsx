@@ -2,15 +2,14 @@
 
 import {
 	ApiError,
+	createApiClient,
 	type HealthResponse,
-	healthHealthGet,
-	setApiBaseUrl,
-	unwrap,
 } from '@node-python/api-client'
 import { useEffect, useState } from 'react'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000'
-setApiBaseUrl(API_BASE)
+const api = createApiClient({
+	baseUrl: process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000',
+})
 
 type LoadState = 'loading' | 'ready' | 'error'
 
@@ -25,7 +24,8 @@ export default function Home() {
 		setStatus('loading')
 		setErrorMessage(null)
 
-		unwrap(healthHealthGet({ signal: controller.signal }))
+		api
+			.health({ signal: controller.signal })
 			.then((data) => {
 				setPayload(data)
 				setStatus('ready')

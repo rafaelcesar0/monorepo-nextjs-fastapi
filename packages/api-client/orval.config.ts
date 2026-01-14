@@ -24,4 +24,13 @@ export default defineConfig({
 			},
 		},
 	},
+	zod: {
+		input: {
+			target: `${API_URL}/openapi.json`,
+		},
+		output: {
+			target: './src/generated/zod.ts',
+			client: 'zod',
+		},
+	},
 })

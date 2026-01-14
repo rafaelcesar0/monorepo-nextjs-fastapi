@@ -27,7 +27,8 @@
 			"!**/.source",
 			"!**/convex/_generated",
 			"!apps/api",
-			"!**/.venv"
+			"!**/.venv",
+			"!packages/api-client/src/generated"
 		]
 	},
 	"formatter": {

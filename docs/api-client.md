@@ -14,12 +14,12 @@ O `@node-python/api-client` é um pacote que contém um **cliente HTTP tipado** 
 FastAPI (Python)              Orval               Frontend (Next.js)
       |                         |                        |
       v                         v                        v
- /openapi.json  ------>  packages/api-client  ------>  healthHealthGet()
+ /openapi.json  ------>  packages/api-client  ------>  api.health()
 ```
 
 1. O FastAPI gera automaticamente o schema OpenAPI em `/openapi.json`
 2. O Orval lê esse schema e gera funções tipadas em `src/generated/`
-3. O frontend importa e usa as funções diretamente
+3. O frontend cria um cliente com `createApiClient()` e chama os métodos tipados
 
 ## Gerando o cliente
 
@@ -33,22 +33,28 @@ Isso atualiza os arquivos em `packages/api-client/src/generated/`.
 
 ## Usando no código
 
-### Funções geradas (100% type-safe)
+### Client factory (recomendado)
 
 ```typescript
-import { healthHealthGet, unwrap, ApiError } from "@node-python/api-client";
+import { createApiClient, ApiError, type HealthResponse } from "@node-python/api-client";
 
-// Chamada direta - retorna { data, status, headers }
-const response = await healthHealthGet();
-console.log(response.data.status);
+// Cria instância do cliente com URL base
+const api = createApiClient({
+  baseUrl: "http://localhost:8000",
+  headers: { "X-Custom-Header": "value" }, // opcional
+});
 
-// Com unwrap - retorna data diretamente, throw em caso de erro
-const data = await unwrap(healthHealthGet());
-console.log(data.status); // tipado!
+// Chamada simples
+const data = await api.health();
+console.log(data.status); // tipado como HealthResponse
+
+// Com AbortController (para cancelar requisições)
+const controller = new AbortController();
+const data = await api.health({ signal: controller.signal });
 
 // Tratamento de erro
 try {
-  const data = await unwrap(healthHealthGet());
+  const data = await api.health();
 } catch (e) {
   if (e instanceof ApiError) {
     console.error(e.status, e.body);
@@ -56,13 +62,26 @@ try {
 }
 ```
 
+### Funções low-level (uso avançado)
+
+```typescript
+import { healthHealthGet, unwrap } from "@node-python/api-client";
+
+// Chamada direta - retorna { data, status, headers }
+const response = await healthHealthGet();
+console.log(response.data.status);
+
+// Com unwrap - retorna data diretamente, throw em caso de erro
+const data = await unwrap(healthHealthGet());
+```
+
 ### Tipos gerados
 
 ```typescript
-import type { HealthHealthGet200 } from "@node-python/api-client";
+import type { HealthResponse } from "@node-python/api-client";
 
 // Tipo de resposta do endpoint /health
-const status: HealthHealthGet200 = { status: "ok" };
+const status: HealthResponse = { status: "ok" };
 ```
 
 ## Quando regenerar?
@@ -83,6 +102,7 @@ bun api:client
 
 ## Dicas
 
-1. **Use `unwrap()`** para obter data tipado diretamente
-2. **Regenere após mudanças na API** para manter sincronizado
-3. **Importe tipos** de `@node-python/api-client` para tipar seus componentes
+1. **Use `createApiClient()`** para criar uma instância configurada do cliente
+2. **Passe `signal`** do AbortController para cancelar requisições em cleanup do React
+3. **Regenere após mudanças na API** para manter sincronizado
+4. **Importe tipos** de `@node-python/api-client` para tipar seus componentes

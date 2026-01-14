@@ -20,7 +20,7 @@
 		"check-types": {
 			"dependsOn": ["^check-types"]
 		},
-		"gen-types": {
+		"codegen": {
 			"cache": false
 		}
 	}

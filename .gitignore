@@ -8,6 +8,9 @@ dist
 build
 *.tsbuildinfo
 
+# Generated code
+packages/api-client/src/generated
+
 # Environment variables
 .env
 .env*.local

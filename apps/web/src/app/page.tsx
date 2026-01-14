@@ -1,12 +1,16 @@
 'use client'
 
-import type { paths } from '@node-python/api-client'
+import {
+	ApiError,
+	type HealthResponse,
+	healthHealthGet,
+	setApiBaseUrl,
+	unwrap,
+} from '@node-python/api-client'
 import { useEffect, useState } from 'react'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? '/api'
-
-type HealthResponse =
-	paths['/health']['get']['responses']['200']['content']['application/json']
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000'
+setApiBaseUrl(API_BASE)
 
 type LoadState = 'loading' | 'ready' | 'error'
 
@@ -21,13 +25,7 @@ export default function Home() {
 		setStatus('loading')
 		setErrorMessage(null)
 
-		fetch(`${API_BASE}/health`, { signal: controller.signal })
-			.then(async (response) => {
-				if (!response.ok) {
-					throw new Error(`HTTP ${response.status}`)
-				}
-				return (await response.json()) as HealthResponse
-			})
+		unwrap(healthHealthGet({ signal: controller.signal }))
 			.then((data) => {
 				setPayload(data)
 				setStatus('ready')
@@ -36,9 +34,13 @@ export default function Home() {
 				if (error instanceof DOMException && error.name === 'AbortError') {
 					return
 				}
-				setErrorMessage(
-					error instanceof Error ? error.message : 'Request failed',
-				)
+				if (error instanceof ApiError) {
+					setErrorMessage(`HTTP ${error.status}`)
+				} else {
+					setErrorMessage(
+						error instanceof Error ? error.message : 'Request failed',
+					)
+				}
 				setStatus('error')
 			})
 
@@ -49,12 +51,7 @@ export default function Home() {
 		<div className='container mx-auto max-w-3xl px-4 py-10'>
 			<div className='grid gap-6'>
 				<section className='rounded-lg border p-4'>
-					<div className='flex flex-wrap items-center justify-between gap-2'>
-						<h2 className='font-medium'>API Status</h2>
-						<span className='text-muted-foreground text-xs'>
-							Base: {API_BASE}
-						</span>
-					</div>
+					<h2 className='font-medium'>API Status</h2>
 					<pre className='mt-3 rounded-md bg-muted px-3 py-2 text-xs'>
 						{status === 'loading' && 'Connecting...'}
 						{status === 'error' && `Failed: ${errorMessage ?? 'Unknown error'}`}

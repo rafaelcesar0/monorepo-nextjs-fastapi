@@ -1,22 +1,22 @@
 {
 	"name": "@node-python/api-client",
 	"version": "0.0.0",
-	"private": true,
-	"type": "module",
+	"devDependencies": {
+		"orval": "^7.18.0",
+		"typescript": "^5"
+	},
 	"exports": {
 		".": {
 			"types": "./src/index.ts",
 			"default": "./src/index.ts"
 		}
 	},
+	"private": true,
 	"scripts": {
-		"gen-types": "openapi-typescript http://localhost:8000/openapi.json -o src/types.ts",
+		"codegen": "orval",
 		"build": "echo 'Types only package'",
 		"lint": "biome check .",
 		"test": "echo \"No tests\""
 	},
-	"devDependencies": {
-		"openapi-typescript": "^6.7.0",
-		"typescript": "^5"
-	}
+	"type": "module"
 }

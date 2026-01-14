@@ -10,7 +10,7 @@
 		"dev": "turbo dev",
 		"web:dev": "turbo -F web dev",
 		"api:dev": "turbo -F api dev",
-		"api:client": "turbo -F @node-python/api-client gen-types",
+		"api:client": "turbo -F @node-python/api-client codegen",
 		"build": "turbo build",
 		"lint": "turbo lint",
 		"test": "turbo test",
